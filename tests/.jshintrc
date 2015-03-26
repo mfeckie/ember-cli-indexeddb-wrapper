@@ -21,7 +21,9 @@
     "andThen",
     "currentURL",
     "currentPath",
-    "currentRouteName"
+    "currentRouteName",
+    "indexedDB",
+    "QUnit"
   ],
   "node": false,
   "browser": false,
