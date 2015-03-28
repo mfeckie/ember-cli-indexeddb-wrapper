@@ -1,23 +1,11 @@
 import Ember from 'ember';
 
-// var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
-
 export default Ember.Service.extend({
   databaseNamespace: 'ember-idb',
   version: 1,
-  createDB: function () {
-
-      var openRequest = indexedDB.open(this.get('databaseNamespace'), 1);
-
-      openRequest.onupgradeneeded = function (e) {
-        console.log('Upgrading');
-      };
-
-      openRequest.onsuccess = function (e) {
-      }
-
-      openRequest.error = function (e) {
-      };
+  objectStores: [],
+  init: function() {
+    this._addObjectStores();
   },
   getConnection: function () {
     return new Ember.RSVP.Promise((resolve, reject) => {
@@ -33,29 +21,30 @@ export default Ember.Service.extend({
       };
     });
   },
-  addObjectStore: function (storeName) {
+  _addObjectStores: function () {
     var self = this;
     return new Ember.RSVP.Promise((resolve, reject) => {
       var version = this.get('version') + 1;
 
       var openRequest = indexedDB.open(this.get('databaseNamespace', version));
-      
+
       openRequest.onupgradeneeded = function (e) {
         var conn = e.target.result;
-        if (!conn.objectStoreNames.contains(storeName)) {
-          conn.createObjectStore(storeName);
-        };
+        self.objectStores.forEach(function(storeName){
+          if (!conn.objectStoreNames.contains(storeName)) {
+            return conn.createObjectStore(storeName);
+          };
+        });
       }
 
       openRequest.onsuccess = function (e) {
-        self.set('version', version);
-
         e.target.result.close();
+        self.set('version', version);
         resolve();
-      };
+      }
 
       openRequest.onerror = function (e) {
-        console.log('onerror');
+        console.log('onerror', e);
         reject(e);
       }
 
