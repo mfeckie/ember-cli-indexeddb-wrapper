@@ -45,6 +45,30 @@ export default Ember.Service.extend({
       });
     })
   },
+  update: function(storeName, id, object) {
+    return new Ember.RSVP.Promise((resolve, reject) => {
+      this.getConnection().then(function(db) {
+
+        var transaction = db.transaction([storeName], 'readwrite');
+
+        var objectStore = transaction.objectStore(storeName);
+        
+        var storeRequest = objectStore.put(object, id);
+
+        storeRequest.onsuccess = function () {
+          resolve(true);
+          db.close();
+        }
+
+        storeRequest.onerror = function (e) {
+          console.log('Store error', e);
+          reject();
+          db.close()
+        }
+
+      });
+    });
+  },
   retreive: function(storeName, id) {
     return new Ember.RSVP.Promise((resolve, reject) => {
       this.getConnection().then(function(db) {
