@@ -21,6 +21,56 @@ export default Ember.Service.extend({
       };
     });
   },
+  save: function (storeName, object) {
+    return new Ember.RSVP.Promise((resolve, reject) => {
+      this.getConnection().then(function(db) {
+
+        var transaction = db.transaction([storeName], 'readwrite');
+
+        var objectStore = transaction.objectStore(storeName);
+
+        var storeRequest = objectStore.add(object);
+
+        storeRequest.onsuccess = function () {
+          resolve(true);
+          db.close();
+        }
+
+        storeRequest.onerror = function (e) {
+          console.log('Store error', e);
+          reject(false);
+          db.close()
+        }
+
+      });
+    })
+  },
+  retreive: function(storeName, id) {
+    return new Ember.RSVP.Promise((resolve, reject) => {
+      this.getConnection().then(function(db) {
+        var transaction = db.transaction([storeName], 'readonly');
+
+        var objectStore = transaction.objectStore(storeName);
+
+        var findRequest = objectStore.get(id);
+
+        findRequest.onsuccess = function (e) {
+          var result = e.target.result;
+          if (result !== undefined) {
+            resolve(result)
+          } else {
+            reject(`Record with id ${id} not found`);
+          }
+          db.close();
+        }
+
+        findRequest.onerror = function (e) {
+          console.log('Retreive error', e);
+          db.close();
+        }
+      });
+    });
+  },
   _addObjectStores: function () {
     var self = this;
     return new Ember.RSVP.Promise((resolve, reject) => {
@@ -29,10 +79,10 @@ export default Ember.Service.extend({
       var openRequest = indexedDB.open(this.get('databaseNamespace', version));
 
       openRequest.onupgradeneeded = function (e) {
-        var conn = e.target.result;
+        var db = e.target.result;
         self.objectStores.forEach(function(storeName){
-          if (!conn.objectStoreNames.contains(storeName)) {
-            return conn.createObjectStore(storeName);
+          if (!db.objectStoreNames.contains(storeName)) {
+            return db.createObjectStore(storeName, { autoIncrement : true });
           };
         });
       }

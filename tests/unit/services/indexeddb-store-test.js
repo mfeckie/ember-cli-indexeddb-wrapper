@@ -12,12 +12,13 @@ moduleFor('service:indexeddb-store', {
     indexedDB.deleteDatabase('ember-idb');
   },
   afterEach: function () {
+    QUnit.stop();
     indexedDB.deleteDatabase('ember-idb');
+    QUnit.start();
   }
 });
 
 test('Creates a DB', function(assert) {
-  assert.expect(1);
 
   var service = this.subject();
 
@@ -29,7 +30,6 @@ test('Creates a DB', function(assert) {
 });
 
 test('Creates an object store', function (assert) {
-  assert.expect(1);
   var service = this.subject();
   service.set('objectStores', ['things']);
 
@@ -51,4 +51,33 @@ test('Creates multiple object stores', function (assert) {
     conn.close();
   });
 
+});
+
+test('Add an object to the store', function(assert) {
+  var service = this.subject();
+  service.set('objectStores', ['things']);
+  var testObject = {name: 'Lynda Carter', alias: 'Wonder Woman'};
+  return service.save('things', testObject).then(function(outcome){
+    assert.ok(outcome);
+  });
+});
+
+test('Retreives an object from the store', function(assert) {
+  var service = this.subject();
+  service.set('objectStores', ['things']);
+  var testObject = {name: 'Lynda Carter', alias: 'Wonder Woman'};
+  return service.save('things', testObject).then(function () {
+    service.retreive('things', 1).then(function(wonderWoman) {
+      assert.deepEqual(testObject, wonderWoman);
+    });
+  });
+});
+
+test('Rejects promise when no object is found', function(assert) {
+  var service = this.subject();
+  service.set('objectStores', ['things']);
+  var resolve = function (thing) { console.log(thing);};
+  return service.retreive('things', 1).then(resolve, function (msg) {
+    assert.equal(msg, 'Record with id 1 not found');
+  });
 });
