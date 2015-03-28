@@ -5,6 +5,6 @@
     "Chrome"
   ],
   "launch_in_dev": [
-    "Chrome"
+    "PhantomJS"
   ]
 }
