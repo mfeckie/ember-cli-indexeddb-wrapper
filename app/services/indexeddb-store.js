@@ -28,7 +28,7 @@ export default Ember.Service.extend({
         resolve(e.target.result);
       }
 
-      openRequest.error = function (e) {
+      openRequest.onerror = function (e) {
         reject(e.target);
       };
     });
