@@ -52,7 +52,7 @@ export default Ember.Service.extend({
         var transaction = db.transaction([storeName], 'readwrite');
 
         var objectStore = transaction.objectStore(storeName);
-        
+
         var storeRequest = objectStore.put(object, id);
 
         storeRequest.onsuccess = function () {
@@ -92,6 +92,30 @@ export default Ember.Service.extend({
           console.log('Retreive error', e);
           db.close();
         }
+      });
+    });
+  },
+  deleteItem: function(storeName, id) {
+    return new Ember.RSVP.Promise((resolve, reject) => {
+      this.getConnection().then(function(db) {
+        var transaction = db.transaction([storeName], 'readwrite');
+
+        var objectStore = transaction.objectStore(storeName);
+
+        var deleteRequest = objectStore.delete(id)
+
+        deleteRequest.onsuccess = function () {
+          resolve(true);
+          db.close();
+        };
+
+        deleteRequest.onerror = function (e) {
+          console.log('Delete error', e)
+          reject(e)
+          db.close();
+        }
+
+
       });
     });
   },

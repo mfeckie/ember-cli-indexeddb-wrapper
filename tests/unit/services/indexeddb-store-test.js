@@ -97,3 +97,14 @@ test('Updates an exisiting record', function (assert) {
     });
   });
 });
+
+test('Deleta a record', function (assert) {
+  var service = this.subject();
+  service.set('objectStores', ['things']);
+  var testObject = {name: 'Lynda Carter', alias: 'Wonder Woman'};
+  return service.save('things', testObject).then(function(){
+    service.deleteItem('things', 1).then(function(outcome) {
+      assert.ok(outcome);
+    });
+  });
+});
