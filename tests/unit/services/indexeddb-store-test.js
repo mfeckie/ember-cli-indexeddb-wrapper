@@ -1,15 +1,16 @@
 import {
-  moduleFor,
+  module,
   test
-} from 'ember-qunit';
+} from 'qunit';
 
-import Ember from 'ember';
+import IndexedDBStore from 'indexeddb-wrapper/services/indexeddb-store';
 
-moduleFor('service:indexeddb-store', {
-  // Specify the other units that are required for this test.
-  // needs: ['service:foo']
+var service;
+
+module('indexeddb-store', {
   beforeEach: function () {
     indexedDB.deleteDatabase('ember-idb');
+    service = IndexedDBStore.create();
   },
   afterEach: function () {
     QUnit.stop();
@@ -20,8 +21,6 @@ moduleFor('service:indexeddb-store', {
 
 test('Creates a DB', function(assert) {
 
-  var service = this.subject();
-
   return service.getConnection().then(function(conn) {
     assert.equal(conn.name, 'ember-idb');
     conn.close();
@@ -30,7 +29,6 @@ test('Creates a DB', function(assert) {
 });
 
 test('Creates an object store', function (assert) {
-  var service = this.subject();
   service.set('objectStores', ['things']);
 
   return service.getConnection().then(function(conn) {
@@ -42,7 +40,6 @@ test('Creates an object store', function (assert) {
 
 test('Creates multiple object stores', function (assert) {
   assert.expect(2);
-  var service = this.subject();
   service.set('objectStores',  ['things', 'otherThings']);
 
   return service.getConnection().then(function(conn) {
@@ -54,7 +51,6 @@ test('Creates multiple object stores', function (assert) {
 });
 
 test('Add an object to the store', function(assert) {
-  var service = this.subject();
   service.set('objectStores', ['things']);
   var testObject = {name: 'Lynda Carter', alias: 'Wonder Woman'};
   return service.save('things', testObject).then(function(outcome){
@@ -63,7 +59,6 @@ test('Add an object to the store', function(assert) {
 });
 
 test('Retreives an object from the store', function(assert) {
-  var service = this.subject();
   service.set('objectStores', ['things']);
   var testObject = {name: 'Lynda Carter', alias: 'Wonder Woman'};
   return service.save('things', testObject).then(function () {
@@ -74,7 +69,6 @@ test('Retreives an object from the store', function(assert) {
 });
 
 test('Rejects promise when no object is found', function(assert) {
-  var service = this.subject();
   service.set('objectStores', ['things']);
   var resolve = function (thing) { };
   return service.retreive('things', 1).then(resolve, function (msg) {
@@ -84,7 +78,6 @@ test('Rejects promise when no object is found', function(assert) {
 
 test('Updates an exisiting record', function (assert) {
   assert.expect(2);
-  var service = this.subject();
   service.set('objectStores', ['things']);
   var testObject = {name: 'Lynda Carter', alias: 'Wonder Woman'};
   return service.save('things', testObject).then(function(){
@@ -99,7 +92,6 @@ test('Updates an exisiting record', function (assert) {
 });
 
 test('Deleta a record', function (assert) {
-  var service = this.subject();
   service.set('objectStores', ['things']);
   var testObject = {name: 'Lynda Carter', alias: 'Wonder Woman'};
   return service.save('things', testObject).then(function(){

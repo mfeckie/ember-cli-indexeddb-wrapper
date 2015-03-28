@@ -14,7 +14,7 @@ export default Ember.Service.extend({
 
       openRequest.onsuccess = function (e) {
         resolve(e.target.result);
-      }
+      };
 
       openRequest.onerror = function (e) {
         reject(e.target);
@@ -34,16 +34,16 @@ export default Ember.Service.extend({
         storeRequest.onsuccess = function () {
           resolve(true);
           db.close();
-        }
+        };
 
         storeRequest.onerror = function (e) {
           console.log('Store error', e);
           reject();
-          db.close()
-        }
+          db.close();
+        };
 
       });
-    })
+    });
   },
   update: function(storeName, id, object) {
     return new Ember.RSVP.Promise((resolve, reject) => {
@@ -58,13 +58,13 @@ export default Ember.Service.extend({
         storeRequest.onsuccess = function () {
           resolve(true);
           db.close();
-        }
+        };
 
         storeRequest.onerror = function (e) {
           console.log('Store error', e);
           reject();
-          db.close()
-        }
+          db.close();
+        };
 
       });
     });
@@ -81,17 +81,17 @@ export default Ember.Service.extend({
         findRequest.onsuccess = function (e) {
           var result = e.target.result;
           if (result !== undefined) {
-            resolve(result)
+            resolve(result);
           } else {
             reject(`Record with id ${id} not found`);
           }
           db.close();
-        }
+        };
 
         findRequest.onerror = function (e) {
           console.log('Retreive error', e);
           db.close();
-        }
+        };
       });
     });
   },
@@ -102,7 +102,7 @@ export default Ember.Service.extend({
 
         var objectStore = transaction.objectStore(storeName);
 
-        var deleteRequest = objectStore.delete(id)
+        var deleteRequest = objectStore.delete(id);
 
         deleteRequest.onsuccess = function () {
           resolve(true);
@@ -110,10 +110,10 @@ export default Ember.Service.extend({
         };
 
         deleteRequest.onerror = function (e) {
-          console.log('Delete error', e)
-          reject(e)
+          console.log('Delete error', e);
+          reject(e);
           db.close();
-        }
+        };
 
 
       });
@@ -131,21 +131,21 @@ export default Ember.Service.extend({
         self.objectStores.forEach(function(storeName){
           if (!db.objectStoreNames.contains(storeName)) {
             return db.createObjectStore(storeName, { autoIncrement : true });
-          };
+          }
         });
-      }
+      };
 
       openRequest.onsuccess = function (e) {
         e.target.result.close();
         self.set('version', version);
         resolve();
-      }
+      };
 
       openRequest.onerror = function (e) {
         console.log('onerror', e);
         reject(e);
-      }
+      };
 
-    })
+    });
   }
 });
