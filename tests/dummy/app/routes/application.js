@@ -5,8 +5,9 @@ export default Ember.Route.extend({
   init: function () {
     var store = this.get('myStore');
     store.update('superheroes', 1, {name: 'Peter Parker', alias: 'Spider Man'});
+    store.update('superheroes', 2, {name: 'Jean Grey', alias: 'Phoenix'});
   },
   model: function () {
-    return this.get('myStore').getOne('superheroes',1);
+    return this.get('myStore').getAll('superheroes');
   }
 });

@@ -1,4 +1,10 @@
-<h2 id="title">Welcome to Ember.js</h2>
+<h2 id="title">Welcome to Ember CLI IndexedDB Wrapper</h2>
 
-<p>Real Name: {{model.name}}</p>
-<p>Alias: {{model.alias}}</p>
+<h3>Superheroes</h3>
+
+{{#each hero in model}}
+  <hr/>
+  <p>Real Name: {{hero.name}}</p>
+  <p>Alias: {{hero.alias}}</p>
+{{/each}}
+<hr/>

@@ -59,6 +59,35 @@ export default Ember.Route.extend({
 });
 
 ```
+##Usage
+
+After you've get things set up it should be fairly straightforward to use.  All public methods return promises, so you know what to do with them.
+
+Saving a record or records.  The `save` method takes two parameters, `storeName` and `thing(s)`` to persist.  `thing(s)` can be a single object or an array of objects.
+
+```js
+// Filename app/controller/thing.js
+
+import Ember from 'ember';
+
+export default Ember.Route.extend({
+  myStore: Ember.inject.service(),
+  actions: {
+    save: function (stuff) {
+      var self = this;
+      self.set('saving', true);
+      this.get('myStore').save('superheroes', stuff).then(function () {
+        self.set('saving', false);
+      }, function (err) {
+        self.set('errorMessage', 'Failed to save...');
+      });
+    }
+  }
+});
+
+```
+
+
 
 
 ## Running Tests
@@ -68,7 +97,7 @@ export default Ember.Route.extend({
 
 ## Contributions
 
-Contributions for bug fixes are welcome with tests and documentation.  Please reach out to me if your are thinking about adding a feature before sending a pull request.  This reduces the likelihood of doing work that won't be merged, though if you're forking for your own project then of course knock yourself out and go crazy!
+Contributions for bug fixes are welcome with tests and documentation.  Please reach out to me if you're thinking about adding a feature before sending a pull request.  This reduces the likelihood of doing work that won't be merged. If you're forking for your own project then of course knock yourself out and go crazy!
 
 If you want to make a suggestion, please open an issue on Github.
 
