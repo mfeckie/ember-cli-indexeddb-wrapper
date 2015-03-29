@@ -121,26 +121,31 @@ export default Ember.Service.extend({
   },
   _addObjectStores: function () {
     var self = this;
-    var version = self.get('version');
+    return new Ember.RSVP.Promise(function(resolve, reject){
+      var version = self.get('version');
 
-    var openRequest = indexedDB.open(self.get('databaseNamespace'), version);
+      var openRequest = indexedDB.open(self.get('databaseNamespace'), version);
 
-    openRequest.onupgradeneeded = function (e) {
-      var db = e.target.result;
-      self.objectStores.forEach(function(storeName){
-        if (!db.objectStoreNames.contains(storeName)) {
-          db.createObjectStore(storeName, { autoIncrement : true });
-        }
-      });
-    };
 
-    openRequest.onsuccess = function (e) {
-      e.target.result.close();
-    };
+      openRequest.onupgradeneeded = function (e) {
+        var db = e.target.result;
+        self.objectStores.forEach(function(storeName){
+          if (!db.objectStoreNames.contains(storeName)) {
+            db.createObjectStore(storeName, { autoIncrement : true });
+          }
+        });
+      };
 
-    openRequest.onerror = function (e) {
-      console.log('onerror', e);
-    };
+      openRequest.onsuccess = function (e) {
+        e.target.result.close();
+        resolve();
+      };
 
+      openRequest.onerror = function (e) {
+        console.error(e);
+        reject();
+      };
+
+    });
   }
 });
