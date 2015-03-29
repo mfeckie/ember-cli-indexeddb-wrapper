@@ -1,7 +1,0 @@
-image: iojs/onbuild
-script:
-  - npm install -g ember-cli
-  - npm install -g bower
-  - npm install
-  - bower install
-  - ember test
