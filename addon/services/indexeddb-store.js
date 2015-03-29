@@ -29,14 +29,21 @@ export default Ember.Service.extend({
 
         var objectStore = transaction.objectStore(storeName);
 
-        var storeRequest = objectStore.add(object);
+        if(Array.isArray(object)) {
+          object.forEach(function(item) {
+            objectStore.add(item);
+          });
+        } else {
+          objectStore.add(object);
+        }
 
-        storeRequest.onsuccess = function () {
+        transaction.oncomplete = function () {
           resolve(true);
           db.close();
         };
 
-        storeRequest.onerror = function (e) {
+
+        transaction.onerror = function (e) {
           console.log('Store error', e);
           reject();
           db.close();
@@ -77,11 +84,12 @@ export default Ember.Service.extend({
         var objectStore = transaction.objectStore(storeName);
 
         var findRequest = objectStore.get(id);
+        var record;
 
         findRequest.onsuccess = function (e) {
           var result = e.target.result;
           if (result !== undefined) {
-            resolve(result);
+            record = result;
           } else {
             reject(`Record with id ${id} not found`);
           }
@@ -92,6 +100,41 @@ export default Ember.Service.extend({
           console.log('Retreive error', e);
           db.close();
         };
+
+        transaction.oncomplete = function () {
+          resolve(record);
+          db.close();
+        };
+
+      });
+    });
+  },
+  getAll: function (storeName) {
+    return new Ember.RSVP.Promise((resolve, reject) =>{
+      this.getConnection().then(function(db) {
+        var transaction = db.transaction([storeName], 'readonly');
+
+        var objectStore = transaction.objectStore(storeName);
+
+        var records = [];
+
+        var iterator = objectStore.openCursor();
+
+        iterator.onsuccess = function(e) {
+          var cursor = e.target.result;
+          if (cursor) {
+            records.push(cursor.value);
+            cursor.continue();
+          } else {
+            resolve(records);
+            db.close();
+          }
+        };
+
+        iterator.onerror = function () {
+          reject();
+        };
+
       });
     });
   },
@@ -102,14 +145,14 @@ export default Ember.Service.extend({
 
         var objectStore = transaction.objectStore(storeName);
 
-        var deleteRequest = objectStore.delete(id);
+        objectStore.delete(id);
 
-        deleteRequest.onsuccess = function () {
+        transaction.oncomplete = function () {
           resolve(true);
           db.close();
         };
 
-        deleteRequest.onerror = function (e) {
+        transaction.onerror = function (e) {
           console.log('Delete error', e);
           reject(e);
           db.close();

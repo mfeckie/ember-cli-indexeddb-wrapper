@@ -91,12 +91,46 @@ test('Updates an exisiting record', function (assert) {
   });
 });
 
-test('Deleta a record', function (assert) {
+test('Deletes a record', function (assert) {
   service.set('objectStores', ['things']);
   var testObject = {name: 'Lynda Carter', alias: 'Wonder Woman'};
   return service.save('things', testObject).then(function(){
     service.deleteItem('things', 1).then(function(outcome) {
       assert.ok(outcome);
+    });
+  });
+});
+
+test('Saves many', function (assert) {
+  assert.expect(2);
+  service.set('objectStores', ['things']);
+  var testObjects = [
+    {name: 'Lynda Carter', alias: 'Wonder Woman'},
+    {name: 'Jean Grey', alias: 'Storm'}
+    ];
+
+  return service.save('things', testObjects).then(function(){
+    service.getOne('things', 1).then(function (result) {
+      assert.deepEqual(result, testObjects[0]);
+
+      service.getOne('things', 2).then(function (result) {
+        assert.deepEqual(result, testObjects[1]);
+      });
+
+    });
+  });
+
+});
+
+test('Retreives many', function (assert) {
+  service.set('objectStores', ['things']);
+  var testObjects = [
+    {name: 'Lynda Carter', alias: 'Wonder Woman'},
+    {name: 'Jean Grey', alias: 'Storm'}
+    ];
+  return service.save('things', testObjects).then(function(){
+    service.getAll('things').then(function (result) {
+      assert.deepEqual(result, testObjects);
     });
   });
 });
