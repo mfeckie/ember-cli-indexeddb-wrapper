@@ -59,7 +59,7 @@ export default Ember.Route.extend({
 });
 
 ```
-##Usage
+## Usage
 
 After you've get things set up it should be fairly straightforward to use.  All public methods return promises, so you know what to do with them.
 
