@@ -62,7 +62,7 @@ test('Retreives an object from the store', function(assert) {
   service.set('objectStores', ['things']);
   var testObject = {name: 'Lynda Carter', alias: 'Wonder Woman'};
   return service.save('things', testObject).then(function () {
-    service.retreive('things', 1).then(function(wonderWoman) {
+    service.getOne('things', 1).then(function(wonderWoman) {
       assert.deepEqual(testObject, wonderWoman);
     });
   });
@@ -71,7 +71,7 @@ test('Retreives an object from the store', function(assert) {
 test('Rejects promise when no object is found', function(assert) {
   service.set('objectStores', ['things']);
   var resolve = function (thing) { };
-  return service.retreive('things', 1).then(resolve, function (msg) {
+  return service.getOne('things', 1).then(resolve, function (msg) {
     assert.equal(msg, 'Record with id 1 not found');
   });
 });
@@ -84,7 +84,7 @@ test('Updates an exisiting record', function (assert) {
     testObject.status = 'alive';
     service.update('things',1,testObject).then(function(outcome) {
       assert.ok(outcome);
-      service.retreive('things', 1).then(function(result) {
+      service.getOne('things', 1).then(function(result) {
         assert.deepEqual(result, testObject);
       });
     });

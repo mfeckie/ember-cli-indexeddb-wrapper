@@ -69,7 +69,7 @@ export default Ember.Service.extend({
       });
     });
   },
-  retreive: function(storeName, id) {
+  getOne: function(storeName, id) {
     return new Ember.RSVP.Promise((resolve, reject) => {
       this.getConnection().then(function(db) {
         var transaction = db.transaction([storeName], 'readonly');
@@ -114,7 +114,6 @@ export default Ember.Service.extend({
           reject(e);
           db.close();
         };
-
 
       });
     });
