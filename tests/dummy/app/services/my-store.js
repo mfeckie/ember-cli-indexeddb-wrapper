@@ -1,4 +1,4 @@
-import IndexedDBStore from 'indexeddb-wrapper/services/indexeddb-store';
+import IndexedDBStore from 'ember-cli-indexeddb-wrapper/services/indexeddb-store';
 
 export default IndexedDBStore.extend({
   databaseNamespace: 'stuff',

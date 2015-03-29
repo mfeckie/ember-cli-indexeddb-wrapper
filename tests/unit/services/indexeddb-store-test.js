@@ -3,7 +3,7 @@ import {
   test
 } from 'qunit';
 
-import IndexedDBStore from 'indexeddb-wrapper/services/indexeddb-store';
+import IndexedDBStore from 'ember-cli-indexeddb-wrapper/services/indexeddb-store';
 
 var service;
 

@@ -2,5 +2,5 @@
 'use strict';
 
 module.exports = {
-  name: 'indexeddb-wrapper'
+  name: 'ember-cli-indexeddb-wrapper'
 };
