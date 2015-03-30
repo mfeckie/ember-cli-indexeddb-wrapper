@@ -19,6 +19,10 @@ module('indexeddb-store', {
   }
 });
 
+var setThingStore = function (service) {
+  return service.set('objectStores', [{name: 'things'}]);
+};
+
 test('Creates a DB', function(assert) {
 
   return service.getConnection().then(function(conn) {
@@ -29,7 +33,7 @@ test('Creates a DB', function(assert) {
 });
 
 test('Creates an object store', function (assert) {
-  service.set('objectStores', ['things']);
+  setThingStore(service);
 
   return service.getConnection().then(function(conn) {
     assert.ok(conn.objectStoreNames.contains('things'));
@@ -40,18 +44,38 @@ test('Creates an object store', function (assert) {
 
 test('Creates multiple object stores', function (assert) {
   assert.expect(2);
-  service.set('objectStores',  ['things', 'otherThings']);
+  service.set('objectStores',  [
+    {name: 'things'},
+    {name: 'otherThings'}
+    ]);
 
   return service.getConnection().then(function(conn) {
     assert.ok(conn.objectStoreNames.contains('things'));
     assert.ok(conn.objectStoreNames.contains('otherThings'));
     conn.close();
   });
+});
 
+test('Can create stores with indexes', function (assert){
+  service.set('objectStores', [
+      {
+        name: 'indexedThings',
+        indexes: [{key: 'name', options: {unique: true}}]
+      }
+    ]);
+
+  var testObjects = [
+    {name: 'Lynda Carter', alias: 'Wonder Woman'},
+    {name: 'Lynda Carter', alias: 'Batman'}
+    ];
+  var resolve = function () {};
+  return service.save('indexedThings', testObjects).then(resolve, function (msg) {
+    assert.equal(msg.name, 'ConstraintError');
+  });
 });
 
 test('Add an object to the store', function(assert) {
-  service.set('objectStores', ['things']);
+  setThingStore(service);
   var testObject = {name: 'Lynda Carter', alias: 'Wonder Woman'};
   return service.save('things', testObject).then(function(outcome){
     assert.ok(outcome);
@@ -59,7 +83,7 @@ test('Add an object to the store', function(assert) {
 });
 
 test('Retreives an object from the store', function(assert) {
-  service.set('objectStores', ['things']);
+  setThingStore(service);
   var testObject = {name: 'Lynda Carter', alias: 'Wonder Woman'};
   return service.save('things', testObject).then(function () {
     service.getOne('things', 1).then(function(wonderWoman) {
@@ -69,7 +93,7 @@ test('Retreives an object from the store', function(assert) {
 });
 
 test('Rejects promise when no object is found', function(assert) {
-  service.set('objectStores', ['things']);
+  setThingStore(service);
   var resolve = function (thing) { };
   return service.getOne('things', 1).then(resolve, function (msg) {
     assert.equal(msg, 'Record with id 1 not found');
@@ -78,7 +102,7 @@ test('Rejects promise when no object is found', function(assert) {
 
 test('Updates an exisiting record', function (assert) {
   assert.expect(2);
-  service.set('objectStores', ['things']);
+  setThingStore(service);
   var testObject = {name: 'Lynda Carter', alias: 'Wonder Woman'};
   return service.save('things', testObject).then(function(){
     testObject.status = 'alive';
@@ -92,7 +116,7 @@ test('Updates an exisiting record', function (assert) {
 });
 
 test('Deletes a record', function (assert) {
-  service.set('objectStores', ['things']);
+  setThingStore(service);
   var testObject = {name: 'Lynda Carter', alias: 'Wonder Woman'};
   return service.save('things', testObject).then(function(){
     service.deleteItem('things', 1).then(function(outcome) {
@@ -103,10 +127,10 @@ test('Deletes a record', function (assert) {
 
 test('Saves many', function (assert) {
   assert.expect(2);
-  service.set('objectStores', ['things']);
+  setThingStore(service);
   var testObjects = [
     {name: 'Lynda Carter', alias: 'Wonder Woman'},
-    {name: 'Jean Grey', alias: 'Storm'}
+    {name: 'Jean Grey', alias: 'Phoenix'}
     ];
 
   return service.save('things', testObjects).then(function(){
@@ -123,10 +147,10 @@ test('Saves many', function (assert) {
 });
 
 test('Retreives many', function (assert) {
-  service.set('objectStores', ['things']);
+  setThingStore(service);
   var testObjects = [
     {name: 'Lynda Carter', alias: 'Wonder Woman'},
-    {name: 'Jean Grey', alias: 'Storm'}
+    {name: 'Jean Grey', alias: 'Phoenix'}
     ];
   return service.save('things', testObjects).then(function(){
     service.getAll('things').then(function (result) {

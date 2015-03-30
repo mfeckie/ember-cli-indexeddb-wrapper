@@ -10,5 +10,5 @@ export default IndexedDBStore.extend({
   // Override these properties to customise for your application
   // databaseNamespace: '',
   // version: 1,
-  // objectStores: []
+  // objectStores: [{ name: 'things', indexes: [{key: 'name', options: {unique: true}}]}]
 });

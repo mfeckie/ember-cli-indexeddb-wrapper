@@ -45,7 +45,7 @@ export default Ember.Service.extend({
 
         transaction.onerror = function (e) {
           console.log('Store error', e);
-          reject();
+          reject(e.target.error);
           db.close();
         };
 
@@ -69,7 +69,7 @@ export default Ember.Service.extend({
 
         storeRequest.onerror = function (e) {
           console.log('Store error', e);
-          reject();
+          reject(e.target.error);
           db.close();
         };
 
@@ -170,12 +170,20 @@ export default Ember.Service.extend({
 
     openRequest.onupgradeneeded = function (e) {
       var db = e.target.result;
-      self.objectStores.forEach(function(storeName){
-        if (!db.objectStoreNames.contains(storeName)) {
-          db.createObjectStore(storeName, { autoIncrement : true });
+      self.objectStores.forEach(function(store){
+        if (!db.objectStoreNames.contains(store.name)) {
+          var objectStore = db.createObjectStore(store.name, { autoIncrement : true });
+
+          if(store.hasOwnProperty('indexes') && store.indexes.length > 0) {
+            store.indexes.forEach(function(index) {
+              objectStore.createIndex(index.key, index.key, index.options);
+            });
+          }
         }
       });
     };
+
+
 
     openRequest.onsuccess = function (e) {
       e.target.result.close();
