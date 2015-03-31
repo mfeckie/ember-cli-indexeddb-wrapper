@@ -82,7 +82,7 @@ test('Add an object to the store', function(assert) {
   });
 });
 
-test('Retreives an object from the store', function(assert) {
+test('Retrieves an object from the store', function(assert) {
   setThingStore(service);
   var testObject = {name: 'Lynda Carter', alias: 'Wonder Woman'};
   return service.save('things', testObject).then(function () {
@@ -146,7 +146,7 @@ test('Saves many', function (assert) {
 
 });
 
-test('Retreives many', function (assert) {
+test('Retrieves many', function (assert) {
   setThingStore(service);
   var testObjects = [
     {name: 'Lynda Carter', alias: 'Wonder Woman'},
@@ -155,6 +155,23 @@ test('Retreives many', function (assert) {
   return service.save('things', testObjects).then(function(){
     service.getAll('things').then(function (result) {
       assert.deepEqual(result, testObjects);
+    });
+  });
+});
+
+test('Retrieves objects by index', function (assert){
+  service.set('objectStores', [{name: 'superheroes', indexes: [
+    {key: 'alias', options: {}}
+  ]}]);
+  var testObjects = [
+    {name: 'Jean Grey', alias: 'Phoenix'},
+    {name: 'Lynda Carter', alias: 'Wonder Woman'},
+    {name: 'Jean Grey-Summers', alias: 'Phoenix'},
+    {alias: 'Phoenix'}
+  ];
+  return service.save('superheroes', testObjects).then(function() {
+    service.getByIndex('superheroes', 'alias', 'Phoenix').then(function(records) {
+      assert.deepEqual(records, [testObjects[0], testObjects[2], testObjects[3]]);
     });
   });
 });

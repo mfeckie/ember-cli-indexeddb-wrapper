@@ -2,7 +2,7 @@
 
 <h3>Superheroes</h3>
 
-{{#each hero in model}}
+{{#each model as |hero| }}
   <hr/>
   <p>Real Name: {{hero.name}}</p>
   <p>Alias: {{hero.alias}}</p>

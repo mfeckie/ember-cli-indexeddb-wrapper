@@ -6,7 +6,7 @@ This addon provides a thin wrapper around IndexedDB to easily use in your projec
 
 Ember Data is not currently supported.
 
-**This library is still in very early stages so please treat it with suspicion until stabilised :smile: **
+**This library is still in very early stages so please treat it with suspicion until stabilised** :smile:
 
 ## Installation
 
@@ -28,7 +28,7 @@ export default IndexedDBStore.extend({
 });
 ```
 
-* **optional** `ember g initializer <service-name>`
+**optional** `ember g initializer <service-name>`
 
 Which will generate an initializer.  Add `application.inject` calls to make the service available in the areas you wish, `controllers` and `routes` in the example below.
 
@@ -107,7 +107,19 @@ export default Ember.Route.extend({
 
 ```
 
+You can retreive records by index wtih a search term. call `.getByIndex(storeName, indexName, searchTerm)`,  This will return an array of objects where the searchTerm matches the key.
 
+```js
+// Filename app/routes/application.js
+
+import Ember from 'ember';
+
+export default Ember.Route.extend({
+  model: function () {
+    return this.myStore.getByIndex('superheroes', 'alias', 'Phoenix');
+  }
+});
+```
 
 
 ## Running Tests

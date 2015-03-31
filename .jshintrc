@@ -3,7 +3,8 @@
     "document",
     "window",
     "-Promise",
-    "indexedDB"
+    "indexedDB",
+    "IDBKeyRange"
   ],
   "browser": true,
   "boss": true,

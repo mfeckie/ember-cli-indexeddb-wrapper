@@ -138,6 +138,34 @@ export default Ember.Service.extend({
       });
     });
   },
+  getByIndex: function (storeName, indexName, searchTerm) {
+    return new Ember.RSVP.Promise((resolve, reject) => {
+      this.getConnection().then(function(db) {
+        var transaction = db.transaction([storeName], 'readonly');
+        var objectStore = transaction.objectStore(storeName);
+        var index = objectStore.index(indexName);
+        var rangeConstraint = IDBKeyRange.only(searchTerm);
+        var results = [];
+
+
+        index.openCursor(rangeConstraint).onsuccess = function (e) {
+          var cursor = e.target.result;
+          if(cursor) {
+            results.push(cursor.value);
+            cursor.continue();
+          } else {
+            resolve(results);
+            db.close();
+          }
+        };
+
+        transaction.onerror = function (e) {
+          reject(e.target.error);
+        };
+
+      });
+    });
+  },
   deleteItem: function(storeName, id) {
     return new Ember.RSVP.Promise((resolve, reject) => {
       this.getConnection().then(function(db) {
