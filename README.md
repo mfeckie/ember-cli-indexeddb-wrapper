@@ -6,6 +6,8 @@ This addon provides a thin wrapper around IndexedDB to easily use in your projec
 
 Ember Data is not currently supported.
 
+**This library is still in very early stages so please treat it with suspicion until stabilised :smile: **
+
 ## Installation
 
 * `ember install:addon ember-cli-indexeddb-wrapper`
@@ -22,20 +24,20 @@ import IndexedDBStore from 'ember-cli-indexeddb-wrapper/services/indexeddb-store
 export default IndexedDBStore.extend({
   databaseNamespace: 'stuff',
   version: 1,
-  objectStores: ['superheroes']
+  objectStores: [{name: 'superheroes', indexes: [{key: 'name', options: {unique: true}}]}]
 });
 ```
 
 * **optional** `ember g initializer <service-name>`
 
-Which will generate an initializer.  Add `application.inject` calls to make the service available in the areas you wish, controllers and routes in the example below.
+Which will generate an initializer.  Add `application.inject` calls to make the service available in the areas you wish, `controllers` and `routes` in the example below.
 
 ```js
 // Filename app/initializers/indexeddb-store.js
 
 export function initialize(container, application) {
-  application.inject('controller', 'my-store', 'service:my-store');
-  application.inject('route', 'my-store', 'service:my-store');
+  application.inject('controller', 'myStore', 'service:myStore');
+  application.inject('route', 'myStore', 'service:myStore');
 }
 
 export default {
@@ -44,7 +46,22 @@ export default {
 };
 
 ```
-This allows you to use the service with the Ember injector.
+This allows you to use the service without having to inject the service in every area manually.
+
+```js
+// Filename app/routes/application.js
+
+import Ember from 'ember';
+
+export default Ember.Route.extend({
+  model: function () {
+    return this.myStore.getOne('superheroes',1);
+  }
+});
+
+```
+
+Alternatively you can skip the initializer and simply inject the service anywhere you want to use it.
 
 ```js
 // Filename app/routes/application.js
@@ -54,16 +71,19 @@ import Ember from 'ember';
 export default Ember.Route.extend({
   myStore: Ember.inject.service(),
   model: function () {
-    return this.get('myStore').getOne('superheroes',1);
+    return this.myStore.getOne('superheroes',1);
   }
 });
 
 ```
+
+
+
 ## Usage
 
 After you've get things set up it should be fairly straightforward to use.  All public methods return promises, so you know what to do with them.
 
-Saving a record or records.  The `save` method takes two parameters, `storeName` and `thing(s)`` to persist.  `thing(s)` can be a single object or an array of objects.
+Saving a record or records.  The `save` method takes two parameters, `storeName` and `thing(s)` to persist.   `thing(s)` can be a single object or an Array of objects.
 
 ```js
 // Filename app/controller/thing.js
@@ -73,10 +93,10 @@ import Ember from 'ember';
 export default Ember.Route.extend({
   myStore: Ember.inject.service(),
   actions: {
-    save: function (stuff) {
+    save: function (things) {
       var self = this;
       self.set('saving', true);
-      this.get('myStore').save('superheroes', stuff).then(function () {
+      this.get('myStore').save('superheroes', things).then(function () {
         self.set('saving', false);
       }, function (err) {
         self.set('errorMessage', 'Failed to save...');
