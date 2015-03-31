@@ -1,8 +1,8 @@
 
 
 export function initialize(container, application) {
-  application.inject('controller', 'my-store', 'service:my-store');
-  application.inject('route', 'my-store', 'service:my-store');
+  application.inject('controller', 'myStore', 'service:myStore');
+  application.inject('route', 'myStore', 'service:myStore');
 }
 
 export default {
