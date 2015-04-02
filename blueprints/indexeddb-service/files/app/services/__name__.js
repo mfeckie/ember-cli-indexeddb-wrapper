@@ -8,7 +8,7 @@ import IndexedDBStore from 'ember-cli-indexeddb-wrapper/services/indexeddb-store
 
 export default IndexedDBStore.extend({
   // Override these properties to customise for your application
-  // databaseNamespace: '',
+  // databaseNamespace: '<%= camelizedModuleName %>',
   // version: 1,
   // objectStores: [{ name: 'things', indexes: [{key: 'name', options: {unique: true}}]}]
 });

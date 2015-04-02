@@ -21,7 +21,7 @@ This will then generate a file which you can use to configure the service
 import IndexedDBStore from 'ember-cli-indexeddb-wrapper/services/indexeddb-store';
 
 export default IndexedDBStore.extend({
-  databaseNamespace: 'stuff',
+  databaseNamespace: 'myStore',
   version: 1,
   objectStores: [{name: 'superheroes', indexes: [{key: 'name', options: {unique: true}}]}]
 });
