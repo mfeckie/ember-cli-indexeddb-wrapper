@@ -100,7 +100,7 @@ test('Rejects promise when no object is found', function(assert) {
   });
 });
 
-test('Updates an exisiting record', function (assert) {
+test('Updates an existing record', function (assert) {
   assert.expect(2);
   setThingStore(service);
   var testObject = {name: 'Lynda Carter', alias: 'Wonder Woman'};
