@@ -16,7 +16,6 @@ Ember Data is not currently supported.
 This will then generate a file which you can use to configure the service
 
 
-
 ```js
 // Filename app/services/my-store.js
 import IndexedDBStore from 'ember-cli-indexeddb-wrapper/services/indexeddb-store';
@@ -28,12 +27,12 @@ export default IndexedDBStore.extend({
 });
 ```
 
-**optional** `ember g initializer <service-name>`
+**optional (but recommended!)** `ember g initializer <service-name>`
 
-Which will generate an initializer.  Add `application.inject` calls to make the service available in the areas you wish, `controllers` and `routes` in the example below.
+Which will generate an initializer.  The name should match that of your service.
 
 ```js
-// Filename app/initializers/indexeddb-store.js
+// Filename app/initializers/my-store.js
 
 export function initialize(container, application) {
   application.inject('controller', 'myStore', 'service:myStore');
