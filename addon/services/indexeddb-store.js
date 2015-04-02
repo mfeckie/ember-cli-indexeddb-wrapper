@@ -44,6 +44,7 @@ export default Ember.Service.extend({
 
 
         transaction.onerror = function (e) {
+          e.preventDefault();
           console.log('Store error', e);
           reject(e.target.error);
           db.close();
