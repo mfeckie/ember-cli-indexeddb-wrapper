@@ -116,7 +116,7 @@ export default Ember.Service.extend({
 
         var objectStore = transaction.objectStore(storeName);
 
-        var records = [];
+        var records = Ember.A();
 
         var iterator = objectStore.openCursor();
 
@@ -145,7 +145,7 @@ export default Ember.Service.extend({
         var objectStore = transaction.objectStore(storeName);
         var index = objectStore.index(indexName);
         var rangeConstraint = IDBKeyRange.only(searchTerm);
-        var results = [];
+        var results = Ember.A();
 
 
         index.openCursor(rangeConstraint).onsuccess = function (e) {
