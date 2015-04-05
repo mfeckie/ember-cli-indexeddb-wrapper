@@ -218,7 +218,7 @@ test('Get or create by index when object does not exist', function (assert){
   ]}]);
   return service.getOrCreateByIndex('superheroes', 'alias', 'Cyclops')
   .then(function (result) {
-    assert.deepEqual(result, {});
+    assert.deepEqual(result, {alias: 'Cyclops'});
   });
 });
 

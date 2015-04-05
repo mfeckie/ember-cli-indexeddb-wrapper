@@ -195,9 +195,12 @@ export default Ember.Service.extend({
   },
   getOrCreateByIndex: function (storeName, indexName, searchTerm) {
     return new Ember.RSVP.Promise((resolve, reject) => {
+      var newObject = {};
+      newObject[indexName] = searchTerm;
+
       var create = () => {
-        return this.save(storeName, {}).then(function() {
-          resolve({});
+        return this.save(storeName, newObject).then(function() {
+          resolve(newObject);
         }, function () {
           reject();
         });
