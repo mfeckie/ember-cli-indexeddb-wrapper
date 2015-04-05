@@ -167,6 +167,48 @@ export default Ember.Service.extend({
       });
     });
   },
+  getOneByIndex: function (storeName, indexName, searchTerm) {
+    return new Ember.RSVP.Promise((resolve, reject) => {
+      this.getConnection().then(function (db) {
+        var transaction = db.transaction([storeName], 'readonly');
+        var objectStore = transaction.objectStore(storeName);
+        var index = objectStore.index(indexName);
+        var search = index.get(searchTerm);
+
+        search.onsuccess = function (e) {
+          var result = e.target.result;
+          if (result !== undefined) {
+            resolve(result);
+          } else {
+            reject();
+          }
+          db.close();
+        };
+
+        search.onerror = function () {
+          reject();
+          db.close();
+        };
+
+      });
+    });
+  },
+  getOrCreateByIndex: function (storeName, indexName, searchTerm) {
+    return new Ember.RSVP.Promise((resolve, reject) => {
+      var create = () => {
+        return this.save(storeName, {}).then(function() {
+          resolve({});
+        }, function () {
+          reject();
+        });
+      };
+
+      this.getOneByIndex(storeName, indexName, searchTerm)
+      .then((result) => {
+        resolve(result);
+      }, create);
+    });
+  },
   deleteItem: function(storeName, id) {
     return new Ember.RSVP.Promise((resolve, reject) => {
       this.getConnection().then(function(db) {
@@ -196,7 +238,6 @@ export default Ember.Service.extend({
 
     var openRequest = indexedDB.open(self.get('databaseNamespace'), version);
 
-
     openRequest.onupgradeneeded = function (e) {
       var db = e.target.result;
       self.objectStores.forEach(function(store){
@@ -211,8 +252,6 @@ export default Ember.Service.extend({
         }
       });
     };
-
-
 
     openRequest.onsuccess = function (e) {
       e.target.result.close();
