@@ -193,10 +193,50 @@ export default Ember.Service.extend({
       });
     });
   },
-  getOrCreateByIndex: function (storeName, indexName, searchTerm) {
+  updateByIndex: function (storeName, indexName, searchTerm, updateObject) {
     return new Ember.RSVP.Promise((resolve, reject) => {
-      var newObject = {};
-      newObject[indexName] = searchTerm;
+      this.getConnection().then(function (db) {
+        var transaction = db.transaction([storeName], 'readwrite');
+        var objectStore = transaction.objectStore(storeName);
+        var index = objectStore.index(indexName);
+
+        var rangeConstraint = IDBKeyRange.only(searchTerm);
+
+        index.openCursor(rangeConstraint).onsuccess = function (e) {
+          var cursor = e.target.result;
+          if(cursor) {
+            var updateRequest = cursor.update(updateObject);
+
+            updateRequest.onsuccess = function (e) {
+              resolve(e.target.result);
+              db.close();
+            };
+
+            updateRequest.onerror = function () {
+              reject();
+              db.close();
+            };
+
+          } else {
+            reject();
+            db.close();
+          }
+        };
+
+      });
+    });
+  },
+  getOrCreateByIndex: function (storeName, indexName, searchTerm, customObject) {
+    return new Ember.RSVP.Promise((resolve, reject) => {
+      var newObject;
+
+      if (typeof customObject !== 'undefined') {
+        newObject = customObject;
+      } else {
+        newObject = {};
+        newObject[indexName] = searchTerm;
+      }
+
 
       var create = () => {
         return this.save(storeName, newObject).then(function() {

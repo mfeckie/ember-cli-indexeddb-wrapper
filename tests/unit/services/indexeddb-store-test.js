@@ -222,6 +222,17 @@ test('Get or create by index when object does not exist', function (assert){
   });
 });
 
+test('Get or create by index with custom object', function (assert){
+  service.set('objectStores', [{name: 'superheroes', indexes: [
+    {key: 'alias', options: {}}
+  ]}]);
+  var customObject = {name: 'Scott Summers', alias: 'Cyclops'};
+  return service.getOrCreateByIndex('superheroes', 'alias', 'Cyclops', customObject)
+  .then(function (result) {
+    assert.deepEqual(result, customObject);
+  });
+});
+
 test('Get or create by index when object does exist', function (assert){
   service.set('objectStores', [{name: 'superheroes', indexes: [
     {key: 'alias', options: {}}
@@ -233,6 +244,37 @@ test('Get or create by index when object does exist', function (assert){
     service.getOrCreateByIndex('superheroes', 'alias', 'Wonder Woman')
     .then(function (result) {
       assert.deepEqual(result, testObjects[0]);
+    });
+  });
+});
+
+test('Update by index', function (assert){
+  service.set('objectStores', [{name: 'superheroes', indexes: [
+    {key: 'alias', options: {}}
+  ]}]);
+  var testObject = {name: 'Jean Grey', alias: 'Phoenix'};
+  var replacementObject = {name: 'Jean Grey-Summers', alias: 'Phoenix'};
+  return service.save('superheroes', testObject).then(function () {
+    service.updateByIndex('superheroes', 'alias', 'Phoenix', replacementObject)
+    .then(function () {
+      service.getOneByIndex('superheroes', 'alias', 'Phoenix')
+      .then(function (result) {
+        assert.deepEqual(result, replacementObject);
+      });
+    });
+  });
+});
+
+test('Update by index when object does not exist', function (assert){
+  service.set('objectStores', [{name: 'superheroes', indexes: [
+    {key: 'alias', options: {}}
+  ]}]);
+  var testObject = {name: 'Jean Grey', alias: 'Phoenix'};
+  var replacementObject = {name: 'Jean Grey-Summers', alias: 'Phoenix'};
+  return service.save('superheroes', testObject).then(function () {
+    service.updateByIndex('superheroes', 'alias', 'Cyclops', replacementObject)
+    .then(resolvePlaceholder, function () {
+      assert.ok(true);
     });
   });
 });
