@@ -6,7 +6,10 @@ This addon provides a thin wrapper around IndexedDB to easily use in your projec
 
 Ember Data is not currently supported.
 
-**This library is still in very early stages so please treat it with suspicion until stabilised** :smile:
+** TL:DR I am no longer working on this library due to the wide variety in indexeddb implementations **
+ 
+** Longer version, I was working on this to use in a personal project, but found that indexeddb was unpredicatable platform to platform.  As a result I have abandoned development until such time as indexeddb is more widely implement and more consistent **
+
 
 ## Installation
 
